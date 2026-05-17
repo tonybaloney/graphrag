@@ -156,12 +156,26 @@ async def _derive_from_rows_base(
 
     tick.done()
 
+    # Clawpilot patch: skip content-policy violations rather than aborting the
+    # entire pipeline. Azure OpenAI/Foundry models flag harmless personal
+    # content (e.g. names in calendar entries) often enough that aborting on
+    # any single failure makes the dreaming pipeline unusable. Other errors
+    # still abort.
+    fatal_errors: list[tuple[BaseException, str]] = []
     for error, stack in errors:
-        logger.error(
-            "parallel transformation error", exc_info=error, extra={"stack": stack}
-        )
+        error_str = str(error)
+        if "ContentPolicyViolation" in error_str or "content management policy" in error_str:
+            logger.warning(
+                "Content policy violation - skipping document: %s",
+                error_str[:200],
+            )
+        else:
+            logger.error(
+                "parallel transformation error", exc_info=error, extra={"stack": stack}
+            )
+            fatal_errors.append((error, stack))
 
-    if len(errors) > 0:
-        raise ParallelizationError(len(errors), errors[0][1])
+    if len(fatal_errors) > 0:
+        raise ParallelizationError(len(fatal_errors), fatal_errors[0][1])
 
     return result
