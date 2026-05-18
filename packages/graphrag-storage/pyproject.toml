@@ -35,7 +35,7 @@ dependencies = [
     "azure-identity~=1.25",
     "azure-storage-blob~=12.24",
     "graphrag-common==3.0.9",
-    "pandas~=2.3",
+    "pandas>=2.2,<4",
     "pydantic~=2.10",
 ]
 
