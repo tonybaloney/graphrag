@@ -35,9 +35,9 @@ dependencies = [
     "azure-identity~=1.25",
     "azure-search-documents~=11.6",
     "graphrag-common==3.0.9",
-    "lancedb~=0.24.1",
+    "lancedb>=0.18.0",
     "numpy~=2.1",
-    "pyarrow~=22.0",
+    "pyarrow>=22.0",
     "pydantic~=2.10",
 ]
 
